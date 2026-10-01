@@ -81,7 +81,7 @@ assert.equal(storageFailureCalls, 0);
 // 用真实桥接函数验证 URL、账号、请求格式和结果分类；没有网络请求。
 const networkCalls = [];
 const context = {
-  URL, URLSearchParams, AbortSignal,
+  URL, URLSearchParams, AbortSignal, Blob, FormData,
   location: { href: `https://live.bilibili.com/web-cut/quick-publish.html?live_key=${source.liveKey}&start_time=${start}&end_time=${source.end}&cover=${encodeURIComponent(source.cover)}` },
   document: { cookie: "DedeUserID=123; bili_jct=TEST_CSRF" },
   fetch: async (url, init = {}) => {
@@ -104,10 +104,56 @@ assert.equal(post.init.credentials, "include");
 assert.equal(post.init.body.get("csrf"), "TEST_CSRF");
 assert.equal(post.init.body.get("end_ts"), String(start + 7200));
 assert.equal(post.init.body.get("live_key"), source.liveKey);
+assert.equal(post.init.body.get("av_cover"), source.cover);
+const imageData = "data:image/jpeg;base64,/9j/2Q==";
+const video = { readyState: 4, videoWidth: 1200, videoHeight: 900, getClientRects: () => [{}] };
+let drawn;
+let renderedCanvas;
+context.document.querySelectorAll = () => [video];
+context.document.createElement = () => {
+  const canvas = {
+    getContext: () => ({ fillRect: () => {}, drawImage: (...args) => { drawn = args; } }),
+    toDataURL: (type, quality) => { assert.equal(type, "image/jpeg"); assert.equal(quality, 0.8); return imageData; }
+  };
+  renderedCanvas = canvas;
+  return canvas;
+};
+const captured = await bridge("captureCover", { source });
+assert.equal(captured.data.dataUrl, imageData);
+assert.equal(renderedCanvas.width, 1600);
+assert.equal(renderedCanvas.height, 900);
+assert.deepEqual(drawn.slice(1), [200, 0, 1200, 900], "截帧保持原比例并补边");
+video.readyState = 0;
+assert.equal((await bridge("captureCover", { source })).ok, false);
+video.readyState = 4;
+const originalFetch = context.fetch;
+const uploadedUrl = "https://i0.hdslb.com/bfs/live/custom-cover.jpg";
+context.fetch = async (url, init = {}) => {
+  if (String(url).startsWith("data:")) return { blob: async () => new Blob([new Uint8Array([255, 216, 255, 217])], { type: "image/jpeg" }) };
+  if (String(url).startsWith("https://api.bilibili.com/x/upload/web/image")) {
+    assert.equal(new URL(url).searchParams.get("csrf"), "TEST_CSRF");
+    assert.equal(init.credentials, "include");
+    assert.equal(init.body.get("bucket"), "live");
+    assert.equal(init.body.get("file").type, "image/jpeg");
+    return { ok: true, json: async () => ({ code: 0, data: { location: uploadedUrl } }) };
+  }
+  return originalFetch(url, init);
+};
+assert.equal((await bridge("uploadCover", { source, dataUrl: imageData })).data.url, uploadedUrl);
+await bridge("submit", { source, segment: plan.segments[0], coverUrl: uploadedUrl, withDanmaku: false });
+assert.equal(networkCalls.at(-1).init.body.get("av_cover"), uploadedUrl, "投稿使用选中的封面");
+const callsBeforeInvalidCover = networkCalls.length;
+assert.equal((await bridge("submit", { source, segment: plan.segments[0], coverUrl: "https://example.com/cover.jpg" })).ok, false);
+assert.equal(networkCalls.length, callsBeforeInvalidCover);
+assert.equal((await bridge("uploadCover", { source, dataUrl: "data:image/svg+xml;base64,QQ==" })).ok, false);
+context.fetch = async (url) => String(url).startsWith("data:") ? { blob: async () => new Blob([], { type: "image/jpeg" }) } : { ok: false, status: 503 };
+assert.equal((await bridge("uploadCover", { source, dataUrl: imageData })).error.kind, "preflight", "封面上传失败时未提交视频");
+context.fetch = originalFetch;
 const before = networkCalls.length;
 context.document.cookie = "DedeUserID=999; bili_jct=TEST_CSRF";
 assert.equal((await bridge("submit", { source, segment: plan.segments[1] })).error.kind, "preflight");
 assert.equal(networkCalls.length, before, "账号改变时不得发送请求");
+assert.equal((await bridge("captureCover", { source })).error.kind, "preflight");
 context.document.cookie = "DedeUserID=123; bili_jct=TEST_CSRF";
 context.fetch = async () => { throw new Error("timeout"); };
 assert.equal((await bridge("submit", { source, segment: plan.segments[1] })).error.kind, "uncertain");
@@ -168,4 +214,4 @@ assert.equal(savedNaming[0].title, "van 游戏");
 assert.deepEqual(data[jobKey(source)], plan);
 assert.deepEqual(data[namingHistoryKey("123")], savedNaming);
 delete globalThis.chrome;
-console.log("自检通过：分段、暂停恢复、投稿请求、作者信息、命名去重和上限、账号隔离、旧队列迁移、当前回放命名复用。");
+console.log("自检通过：分段、暂停恢复、作者与命名历史、截帧尺寸、封面上传格式、封面投稿参数和账号校验。");

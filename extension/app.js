@@ -45,6 +45,7 @@ export function mountWorkbench(adapter) {
               <p class="field-help">单段最多 120 分钟，最后一段自动收尾。</p>
               <label for="titleTemplate">标题格式</label><input id="titleTemplate" value="${escapeHtml(DEFAULT_TEMPLATE)}" required>
               <p class="field-help template-help">可用变量 <code>{title}</code> <code>{date}</code> <code>{index}</code> <code>{total}</code> <code>{start}</code> <code>{end}</code></p>
+              <div class="cover-settings" role="group" aria-label="投稿封面"><div class="cover-label">投稿封面 <span id="coverBadge">原回放封面</span></div><div class="cover-preview"><img id="coverImage" alt="当前投稿封面预览" hidden><span id="coverEmpty">暂无封面预览</span></div><div class="cover-actions"><button id="openSourceButton" type="button" class="button secondary small">打开回放选画面 ↗</button><button id="captureCoverButton" type="button" class="button secondary small">使用当前画面</button><button id="restoreCoverButton" type="button" class="text-button">恢复原封面</button></div><p class="field-help">在官方播放器暂停到喜欢的画面，再回来截图。各分段统一使用这张封面，确认投稿时才上传。</p></div>
               <label class="checkbox-label"><input id="withDanmaku" type="checkbox" disabled>同步直播弹幕 <span id="danmakuHint">读取权限中</span></label>
               <button id="planButton" type="submit" class="button primary full-width">更新分段计划 <span>→</span></button>
               <p id="settingsHint" class="settings-hint">标题和每段范围将在右侧预览。</p>
@@ -63,7 +64,7 @@ export function mountWorkbench(adapter) {
         <p class="project-links"><a href="${TOOL_HOME}" target="_blank" rel="noreferrer">工具地址 · GitHub 仓库 ↗</a><span>·</span><a href="${AUTHOR_HOME}" target="_blank" rel="noreferrer">作者 · 球磨川みそぎ（B站）↗</a><span>·</span><button id="aboutButton" class="text-button" type="button">关于作者</button></p>
       </div>
     </main>
-    <dialog id="confirmDialog" aria-labelledby="confirmationHeading"><form method="dialog"><div class="dialog-icon">${playIcon}</div><h2 id="confirmationHeading">确认这次分段投稿</h2><p id="confirmationText"></p><p class="dialog-note">只提交已勾选的片段。遇到失败或不明确的结果，队列会暂停。</p><div class="dialog-actions"><button class="button secondary" value="cancel">再检查一下</button><button class="button primary" value="submit">确认并开始投稿</button></div></form></dialog>
+    <dialog id="confirmDialog" aria-labelledby="confirmationHeading"><form method="dialog"><div class="dialog-icon">${playIcon}</div><h2 id="confirmationHeading">确认这次分段投稿</h2><p id="confirmationText"></p><img id="confirmationCover" class="confirmation-cover" alt="本次投稿使用的封面" hidden><p class="dialog-note">只提交已勾选的片段。遇到失败或不明确的结果，队列会暂停。</p><div class="dialog-actions"><button class="button secondary" value="cancel">再检查一下</button><button class="button primary" value="submit">确认并开始投稿</button></div></form></dialog>
     <dialog id="helpDialog" aria-labelledby="helpHeading"><form method="dialog"><div class="dialog-icon">✦</div><h2 id="helpHeading">三步，交给队列</h2><ol class="guide-list"><li><strong>打开官方回放页</strong><p>在 B 站直播中心 → 直播回放中，点击目标场次的「投片段」。</p></li><li><strong>打开回放接力</strong><p>在该剪辑页点击 Chrome 工具栏的扩展图标，设置标题和每段时长。选择历史命名可快速复用以前的名字和格式。</p></li><li><strong>预览后开始投稿</strong><p>检查每段时间和标题，点击「开始依次投稿」。工具会串行处理，保存每段进度。</p></li></ol><p class="dialog-note">关闭工作台会中断队列。提交中的片段会标为「待核对」，恢复前请查看官方已发布片段。验证码、风控或额度提示需在 B 站页面处理。</p><button class="button primary full-width" value="close">知道了</button></form></dialog>
     <dialog id="aboutDialog" aria-labelledby="aboutHeading"><form method="dialog"><div class="dialog-icon">✦</div><h2 id="aboutHeading">关于回放接力</h2><p class="about-version" id="aboutVersion">本地 Chrome 扩展</p><dl class="author-details"><dt>作者</dt><dd>球磨川みそぎ</dd><dt>GitHub</dt><dd><a href="https://github.com/ChenYilei2016" target="_blank" rel="noreferrer">ChenYilei2016 ↗</a></dd><dt>B 站 UID</dt><dd><a href="${AUTHOR_HOME}" target="_blank" rel="noreferrer">1790439 · 访问作者主页 ↗</a></dd><dt>工具地址</dt><dd><a href="${TOOL_HOME}" target="_blank" rel="noreferrer">cyl-bili-replay-submit ↗</a></dd></dl><p class="dialog-note">命名历史按 B 站账号保存在当前浏览器的扩展数据中，仅复用名字和格式。日期、段号和时间范围会按当前回放重新生成。</p><button class="button primary full-width" value="close">关闭</button></form></dialog>`;
 
@@ -98,6 +99,20 @@ export function mountWorkbench(adapter) {
     element("namingHistoryHint").textContent = locked() ? "当前队列已有投稿记录，命名保持原样。新回放可继续复用历史。" : selected >= 0 ? `已保存格式：${namingHistory[selected].template}` : namingHistory.length ? "选择名字和格式后，会按当前回放重新生成分段预览。" : "更新分段计划后，会记住这次的名字和标题格式。";
   }
 
+  function renderCover() {
+    const preview = job?.cover?.dataUrl || job?.cover?.url || source?.cover || "";
+    const image = element("coverImage");
+    if (preview && image.getAttribute("src") !== preview) image.src = preview;
+    if (!preview) image.removeAttribute("src");
+    image.hidden = !preview;
+    element("coverEmpty").hidden = Boolean(preview);
+    element("coverBadge").textContent = job?.cover ? "已选择回放截图" : "原回放封面";
+    element("openSourceButton").disabled = !source || busy || Boolean(queue?.running);
+    element("captureCoverButton").disabled = !job || busy || Boolean(queue?.running) || Boolean(locked());
+    element("restoreCoverButton").disabled = !job?.cover || busy || Boolean(queue?.running) || Boolean(locked());
+    if (source) element("sourceMeta").textContent = `回放 ID ${source.liveKey} · 账号 ${source.accountId} · ${job?.cover ? "使用选中的回放截图" : "使用官方回放封面"}`;
+  }
+
   function render() {
     const running = Boolean(queue?.running);
     const selected = job?.segments.filter((item) => item.enabled) || [];
@@ -111,6 +126,7 @@ export function mountWorkbench(adapter) {
     }
     element("withDanmaku").disabled = !source?.canPublishDanmaku || busy || running || Boolean(locked());
     renderNamingHistory();
+    renderCover();
     element("settingsHint").textContent = locked() ? "已有投稿记录，分段设置已锁定，防止重排后重复投稿。" : dirty ? "设置已改变，请先更新右侧分段计划。" : "标题和每段范围将在右侧预览。";
     element("startButton").disabled = busy || running || dirty || !pending || unresolved;
     element("startButton").innerHTML = `${playIcon}${job?.status === "paused" ? "继续依次投稿" : "开始依次投稿"}`;
@@ -209,6 +225,7 @@ export function mountWorkbench(adapter) {
     render();
     try {
       const plan = createPlan(source, fieldOptions());
+      if (job?.cover) plan.cover = structuredClone(job.cover);
       namingHistory = await adapter.savePlan(plan);
       job = plan;
       dirty = false;
@@ -263,7 +280,11 @@ export function mountWorkbench(adapter) {
   element("startButton").addEventListener("click", () => {
     if (!job || busy || queue?.running || dirty) return;
     const segments = job.segments.filter((item) => item.enabled && item.status === "pending");
-    element("confirmationText").textContent = `将向 B 站账号 ${source.accountId} 提交 ${segments.length} 个独立片段，使用上方预览的标题和官方回放封面。片段投稿会展示在个人空间和动态中。`;
+    element("confirmDialog").returnValue = "cancel";
+    element("confirmationText").textContent = `将向 B 站账号 ${source.accountId} 提交 ${segments.length} 个独立片段，使用上方预览的标题和${job.cover ? "选中的回放截图封面" : "官方回放封面"}。片段投稿会展示在个人空间和动态中。`;
+    const preview = job.cover?.dataUrl || job.cover?.url || source.cover;
+    element("confirmationCover").hidden = !preview;
+    if (preview) element("confirmationCover").src = preview;
     element("confirmDialog").showModal();
   });
   element("confirmDialog").addEventListener("close", async () => {
@@ -275,7 +296,13 @@ export function mountWorkbench(adapter) {
         const current = await adapter.load(source);
         if (current) job = recoverJob(current);
         namingHistory = await adapter.savePlan(job);
-        queue = new SubmissionQueue({ job, submit: adapter.submit, save: adapter.save, changed: render });
+        if (job.cover?.dataUrl) {
+          notify("正在上传选中的封面，尚未提交视频…");
+          const uploaded = await adapter.uploadCover(job.source, job.cover.dataUrl);
+          job.cover = { type: "frame", url: uploaded.url };
+          await adapter.save(job);
+        }
+        queue = new SubmissionQueue({ job, submit: (segment, replay, options) => adapter.submit(segment, replay, { ...options, coverUrl: job.cover?.url || replay.cover }), save: adapter.save, changed: render });
         notify("队列已开始，遇到失败或待核对结果会自动暂停。");
         await queue.run();
         if (job.status === "completed") notify("所有选中片段已提交。请到 B 站稿件管理查看生成与审核进度。", "success");
@@ -285,6 +312,37 @@ export function mountWorkbench(adapter) {
     finally { busy = false; render(); }
   });
   element("pauseButton").addEventListener("click", () => queue?.pause());
+  element("openSourceButton").addEventListener("click", async () => {
+    if (!source || busy || queue?.running) return;
+    try { await adapter.openSource(); }
+    catch { notify("原回放页已关闭，请从 B 站「投片段」重新打开并点击扩展图标。", "error"); }
+  });
+  element("captureCoverButton").addEventListener("click", async () => {
+    if (!job || busy || locked() || queue?.running) return;
+    busy = true;
+    render();
+    try {
+      const captured = await adapter.captureCover(source);
+      const next = { ...job, cover: { type: "frame", dataUrl: captured.dataUrl } };
+      await adapter.save(next);
+      job = next;
+      notify("已选择当前回放画面作为封面，尚未上传。可以继续换图或调整标题。", "success");
+    } catch (error) { notify(error.message, "error"); }
+    finally { busy = false; render(); }
+  });
+  element("restoreCoverButton").addEventListener("click", async () => {
+    if (!job || busy || locked() || queue?.running) return;
+    busy = true;
+    render();
+    try {
+      const next = { ...job };
+      delete next.cover;
+      await adapter.save(next);
+      job = next;
+      notify("已恢复原回放封面。", "success");
+    } catch (error) { notify(error.message, "error"); }
+    finally { busy = false; render(); }
+  });
   element("refreshButton").addEventListener("click", loadSource);
   element("helpButton").addEventListener("click", () => element("helpDialog").showModal());
   element("aboutButton").addEventListener("click", () => element("aboutDialog").showModal());

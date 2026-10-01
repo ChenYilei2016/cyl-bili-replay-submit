@@ -7,7 +7,7 @@
 | 项目 | 地址 |
 | --- | --- |
 | 工具主页 / 源码 / 安装说明 | [github.com/ChenYilei2016/cyl-bili-replay-submit](https://github.com/ChenYilei2016/cyl-bili-replay-submit) |
-| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.2.0 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.2.0.zip) |
+| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.3.0 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.3.0.zip) |
 | 源码 ZIP 下载 | [下载 main 分支](https://github.com/ChenYilei2016/cyl-bili-replay-submit/archive/refs/heads/main.zip) |
 | 作者 B 站主页 | [球磨川みそぎ · UID 1790439](https://space.bilibili.com/1790439) |
 | 本机交互演示 | [http://127.0.0.1:5817](http://127.0.0.1:5817)（本机启动 `npm run preview` 后打开） |
@@ -36,9 +36,9 @@ cd cyl-bili-replay-submit
 
 ### 快捷安装：拖入 ZIP（推荐）
 
-1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.2.0.zip)，保留 ZIP 文件，无需解压。
+1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.3.0.zip)，保留 ZIP 文件，无需解压。
 2. 使用 Chrome 120 或更高版本，在地址栏输入 `chrome://extensions`，开启右上角「开发者模式」。
-3. 将 `cyl-bili-replay-submit-extension-0.2.0.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载。
+3. 将 `cyl-bili-replay-submit-extension-0.3.0.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载。
 
 扩展安装 ZIP 的根目录直接包含 `manifest.json` 和扩展运行文件，符合[扩展 ZIP 打包要求](https://developer.chrome.com/docs/webstore/prepare)。Chrome 的扩展管理页[支持 ZIP 拖放](https://github.com/chromium/chromium/blob/main/chrome/browser/resources/extensions/drag_and_drop_handler.ts)。GitHub 的「Download ZIP」下载的是整个项目源码，按下方目录方式安装。
 
@@ -58,6 +58,17 @@ cd cyl-bili-replay-submit
 默认每段 120 分钟，请求之间至少间隔 15 秒；可调整为 1–120 分钟和 5–300 秒。每段都单独投稿，编号自动生成；取消勾选可以跳过尚未提交的段。可用标题变量是 `{title}`、`{date}`、`{index}`、`{total}`、`{start}`、`{end}`，最终标题最多 80 个字符。
 
 B 站片段投稿会在个人空间和动态展示。工具的「已提交」表示官方接口接收成功，视频生成、审核和最终发布状态请在[稿件管理](https://member.bilibili.com/platform/upload-manager/article)或直播回放的「已发布片段」中查看。
+
+## 用回放画面换封面
+
+1. 在工作台「投稿封面」点击「打开回放选画面」，回到原 B 站剪辑页。
+2. 使用官方播放器拖到回放里的任意位置，播放到喜欢的画面后暂停。
+3. 回到工作台，点击「使用当前画面」，即可预览这张截图。可以反复换图，也可以点击「恢复原封面」。
+4. 检查标题和分段，点击「开始依次投稿」；确认弹窗会再次展示本次封面。
+
+各分段统一使用选中的这张封面。截图保存在本机，调整标题或复用历史命名时继续保留；确认投稿时才上传到 B 站，上传成功后所有分段复用同一个封面地址。上传失败时停止流程，不发送视频投稿请求；队列已有投稿记录后保持原封面。
+
+截帧沿用官方「使用当前帧」的尺寸，保持原画面比例并补黑边生成 1600×900 JPEG。截图数据上限 2 MiB，不下载整场视频；上传成功后本机队列只保留封面地址。封面绑定当前账号和回放，切换回放时不会从命名历史带入上一场的图。
 
 ## 作者信息与命名历史
 
@@ -80,9 +91,9 @@ B 站片段投稿会在个人空间和动态展示。工具的「已提交」表
 
 ## 实现边界
 
-这是本地 Chrome Manifest V3 扩展，无运行依赖、服务端、账号密码输入或 Cookie 导出。仅申请 `activeTab`、`scripting`、`storage`：点击扩展时授权当前页，在原 B 站页面中执行请求。登录 Cookie 和 CSRF 只在该页面内用于请求 B 站，扩展只保存账号 ID、回放参数、标题和队列进度。一次只运行一个工作台队列。
+这是本地 Chrome Manifest V3 扩展，无运行依赖、服务端、账号密码输入或 Cookie 导出。仅申请 `activeTab`、`scripting`、`storage`：点击扩展时授权当前页，在原 B 站页面中执行请求。登录 Cookie 和 CSRF 只在该页面内用于请求 B 站，扩展保存账号 ID、回放参数、标题、选中的封面和队列进度。一次只运行一个工作台队列。
 
-当前支持自己的主播回放，统一使用原回放封面、正常倍速，不自动添加字幕、付费观看或预约。弹幕同步选项根据官方账号权限开放。Chrome 关闭后不会继续投稿，当前版本没有后台定时任务。
+当前支持自己的主播回放，可统一使用原封面或选中的回放截图，保持正常倍速，不自动添加字幕、付费观看或预约。弹幕同步选项根据官方账号权限开放。Chrome 关闭后不会继续投稿，当前版本没有后台定时任务。
 
 本工具没有解除平台限制：单段仍不超过两小时，整场投稿权限仍以 B 站为准。B 站[直播回放规则说明](https://www.bilibili.com/blackboard/era/q9k5jdgJKZ4oFzUW.html)说明回放保留 14 天，整场投稿需要开播时 500 粉丝以上，片段投稿供所有主播使用。
 
@@ -97,7 +108,7 @@ npm run preview
 
 打开 `http://127.0.0.1:5817` 可使用 **7 小时交互演示**。该页面由独立演示适配器提供数据，投稿按钮只运行模拟队列，不会读取 B 站账号或发送真实投稿。演示进度使用独立的 localStorage，正式扩展使用 Chrome 扩展存储，两者互不影响。
 
-核心逻辑位于 `extension/core.js`，命名历史位于 `extension/naming-history.js`，B 站页面桥接位于 `extension/bilibili.js`，工作台位于 `extension/app.js` 和 `extension/styles.css`。`tests/selfcheck.mjs` 是一个无框架的可运行检查，覆盖连续/断流分段、暂停恢复、结果不明确时停止、账号切换、请求格式，以及命名历史的去重、上限、迁移和账号隔离。
+核心逻辑位于 `extension/core.js`，命名历史位于 `extension/naming-history.js`，B 站页面桥接和截帧上传位于 `extension/bilibili.js`，工作台位于 `extension/app.js` 和 `extension/styles.css`。`tests/selfcheck.mjs` 是一个无框架的可运行检查，覆盖分段、暂停恢复、命名历史、账号隔离、截帧尺寸，以及封面上传和投稿参数。
 
 已通过核心自检和实际浏览器中的模拟流程：7 小时生成四段、提交第一段后暂停、刷新恢复为 1/4、继续时跳过第一段，最终完成 4/4。演示页的「重置演示」可清空独立的模拟进度，重新体验；它不会修改正式扩展的记录。
 
@@ -107,4 +118,6 @@ npm run preview
 - `AnchorGetSettings`：读取当前回放的弹幕投稿权限。
 - `AnchorPublishVideoSlice`：以表单提交 `live_key`、`start_ts`、`end_ts`、`av_title`、`av_cover`、`av_highlight`、`with_subtitle`、`with_danmaku`、`with_reserve`、`csrf`。
 
-这些是当前官方网页使用的内部接口，不是稳定的公开 SDK 合约。页面或接口改变时，工具会显示失败并暂停。开发期间没有发布用户回放；真实账号读取和真实投稿需要安装扩展后在目标账号验证。
+封面上传已核对[官方素材脚本](https://s1.hdslb.com/bfs/static/blive/web-cut/assets/material-Dm-7vzwL.js)：调用 `https://api.bilibili.com/x/upload/web/image?csrf=…`，以 multipart 表单提交 `bucket=live` 和 JPEG `file`，使用返回的 `data.location` 作为 `av_cover`。
+
+这些是当前官方网页使用的内部接口，不是稳定的公开 SDK 合约。页面或接口改变时，工具会显示失败并暂停。开发期间没有发布用户回放或上传真实封面；真实账号读取、封面上传和投稿需要安装扩展后在目标账号验证。

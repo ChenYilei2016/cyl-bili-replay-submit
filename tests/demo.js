@@ -10,6 +10,7 @@ const source = {
 };
 const storageKey = "cyl-bili-replay-demo";
 const namingKey = "cyl-bili-replay-demo-naming";
+let frameNumber = 0;
 async function loadNaming() {
   const saved = JSON.parse(localStorage.getItem(namingKey) || "null");
   if (saved) return normalizeNamingHistory(saved);
@@ -29,6 +30,28 @@ const workbench = mountWorkbench({
     localStorage.setItem(namingKey, JSON.stringify(history));
     return history;
   },
+  openSource: async () => workbench.notify("这是演示页，点击「使用当前画面」可体验模拟截图。"),
+  captureCover: async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1600;
+    canvas.height = 900;
+    const context = canvas.getContext("2d");
+    const gradient = context.createLinearGradient(0, 0, 1600, 900);
+    gradient.addColorStop(0, frameNumber % 2 ? "#34436b" : "#123b48");
+    gradient.addColorStop(1, frameNumber % 2 ? "#9c626a" : "#487e79");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 1600, 900);
+    context.fillStyle = "#ffffff15";
+    context.fillRect(170, 170, 500, 570);
+    context.fillRect(820, 90, 430, 670);
+    context.fillStyle = "#fff";
+    context.font = 'bold 76px sans-serif';
+    context.fillText(`回放画面 · ${++frameNumber}`, 170, 435);
+    context.font = '36px sans-serif';
+    context.fillText("封面选择演示 · 不会上传至 B 站", 170, 510);
+    return { dataUrl: canvas.toDataURL("image/jpeg", 0.8) };
+  },
+  uploadCover: async (_source, dataUrl) => ({ url: dataUrl }),
   submit: async () => { await new Promise((resolve) => setTimeout(resolve, 900)); },
   lock: (callback) => navigator.locks.request("cyl-bili-replay-demo", { ifAvailable: true }, (lock) => {
     if (!lock) throw new Error("另一个演示页正在运行队列。");
