@@ -1,4 +1,5 @@
 node_modules/
 .DS_Store
-dist/
+dist/*
+!dist/cyl-bili-replay-submit-extension-*.zip
 artifacts/

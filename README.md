@@ -7,6 +7,7 @@
 | 项目 | 地址 |
 | --- | --- |
 | 工具主页 / 源码 / 安装说明 | [github.com/ChenYilei2016/cyl-bili-replay-submit](https://github.com/ChenYilei2016/cyl-bili-replay-submit) |
+| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.1.0 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.1.0.zip) |
 | 源码 ZIP 下载 | [下载 main 分支](https://github.com/ChenYilei2016/cyl-bili-replay-submit/archive/refs/heads/main.zip) |
 | 作者 B 站主页 | [球磨川みそぎ · UID 1790439](https://space.bilibili.com/1790439) |
 | 本机交互演示 | [http://127.0.0.1:5817](http://127.0.0.1:5817)（本机启动 `npm run preview` 后打开） |
@@ -33,13 +34,26 @@ cd cyl-bili-replay-submit
 
 ## 安装和使用
 
+### 快捷安装：拖入 ZIP（推荐）
+
+1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.1.0.zip)，保留 ZIP 文件，无需解压。
+2. 使用 Chrome 120 或更高版本，在地址栏输入 `chrome://extensions`，开启右上角「开发者模式」。
+3. 将 `cyl-bili-replay-submit-extension-0.1.0.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载。
+
+扩展安装 ZIP 的根目录直接包含 `manifest.json` 和扩展运行文件，符合[扩展 ZIP 打包要求](https://developer.chrome.com/docs/webstore/prepare)。Chrome 的扩展管理页[支持 ZIP 拖放](https://github.com/chromium/chromium/blob/main/chrome/browser/resources/extensions/drag_and_drop_handler.ts)。GitHub 的「Download ZIP」下载的是整个项目源码，按下方目录方式安装。
+
+### 源码目录安装
+
 1. [下载源码 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/archive/refs/heads/main.zip) 并解压，或执行上面的 `git clone`。
 2. 使用 Chrome 120 或更高版本，在地址栏打开 `chrome://extensions`，开启右上角「开发者模式」。
 3. 点击「加载已解压的扩展程序」，选择解压或克隆后项目中的 **extension** 目录。安装的是本地开发版本，不是 Chrome 商店版本。
-4. 在 B 站网页登录自己的账号，打开[直播中心 → 直播回放](https://link.bilibili.com/p/center/index#/my-room/live-record)，点击目标场次的「投片段」。
-5. 在这个剪辑页点击工具栏的「回放接力」扩展图标。若图标未显示，可在 Chrome 的扩展菜单中固定。
-6. 工作台会读取回放范围。填写回放标题，点击「更新分段计划」，检查每段标题和时间；单段标题也可以直接修改。
-7. 点击「开始依次投稿」，核对确认弹窗后开始。保持原 B 站剪辑页和工作台打开。
+
+### 开始投稿
+
+1. 在 B 站网页登录自己的账号，打开[直播中心 → 直播回放](https://link.bilibili.com/p/center/index#/my-room/live-record)，点击目标场次的「投片段」。
+2. 在这个剪辑页点击工具栏的「回放接力」扩展图标。若图标未显示，可在 Chrome 的扩展菜单中固定。
+3. 工作台会读取回放范围。填写回放标题，点击「更新分段计划」，检查每段标题和时间；单段标题也可以直接修改。
+4. 点击「开始依次投稿」，核对确认弹窗后开始。保持原 B 站剪辑页和工作台打开。
 
 默认每段 120 分钟，请求之间至少间隔 15 秒；可调整为 1–120 分钟和 5–300 秒。每段都单独投稿，编号自动生成；取消勾选可以跳过尚未提交的段。可用标题变量是 `{title}`、`{date}`、`{index}`、`{total}`、`{start}`、`{end}`，最终标题最多 80 个字符。
 
