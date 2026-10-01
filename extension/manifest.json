@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "回放接力 · B站分段投稿",
+  "version": "0.1.0",
+  "minimum_chrome_version": "120",
+  "description": "将自己的长直播回放按最多两小时分段，在预览确认后依次投稿。",
+  "homepage_url": "https://github.com/ChenYilei2016/cyl-bili-replay-submit",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": { "default_title": "打开回放接力" },
+  "background": { "service_worker": "background.js", "type": "module" }
+}

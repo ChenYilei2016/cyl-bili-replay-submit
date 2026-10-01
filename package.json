@@ -1,0 +1,20 @@
+{
+  "name": "cyl-bili-replay-submit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "B 站直播回放自动分段投稿工具",
+  "homepage": "https://github.com/ChenYilei2016/cyl-bili-replay-submit",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ChenYilei2016/cyl-bili-replay-submit.git"
+  },
+  "author": {
+    "name": "ChenYilei2016（球磨川みそぎ）",
+    "url": "https://space.bilibili.com/1790439"
+  },
+  "scripts": {
+    "test": "node tests/selfcheck.mjs",
+    "preview": "node scripts/preview.mjs"
+  }
+}
