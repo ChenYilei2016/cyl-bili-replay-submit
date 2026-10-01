@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import vm from "node:vm";
 import { readFile } from "node:fs/promises";
 import { createPlan, DEFAULT_TEMPLATE, formatTime, recoverJob, SubmissionQueue } from "../extension/core.js";
-import { requestInPage } from "../extension/bilibili.js";
+import { chromeAdapter, jobKey, requestInPage } from "../extension/bilibili.js";
+import { loadNamingHistory, NAMING_HISTORY_LIMIT, namingHistoryFromJobs, namingHistoryKey, rememberNaming } from "../extension/naming-history.js";
 
 const start = 1790679966;
 const source = {
@@ -115,4 +116,56 @@ assert.equal((await bridge("submit", { source, segment: plan.segments[1] })).err
 
 const manifest = JSON.parse(await readFile(new URL("../extension/manifest.json", import.meta.url)));
 assert.deepEqual(manifest.permissions, ["activeTab", "scripting", "storage"]);
-console.log("自检通过：分段边界、断流时间轴、标题和权限、进度落盘、暂停恢复、失败分类、账号校验、投稿请求格式。");
+assert.match(manifest.description, /球磨川みそぎ.*ChenYilei2016.*1790439/);
+
+let naming = [];
+for (let index = 0; index < 25; index++) naming = rememberNaming(naming, { title: `游戏 ${index}`, template: "{date} P{index} {title}" }, index + 1);
+assert.equal(naming.length, NAMING_HISTORY_LIMIT);
+naming = rememberNaming(naming, { title: "游戏 10", template: "{date} P{index} {title}" }, 30);
+assert.equal(naming[0].title, "游戏 10");
+assert.equal(naming.filter((item) => item.title === "游戏 10").length, 1, "相同名字和格式去重");
+naming = rememberNaming(naming, { title: "游戏 10", template: "{title} 第{index}段" }, 31);
+assert.equal(naming.filter((item) => item.title === "游戏 10").length, 2, "同名的不同格式都要保留");
+const legacyJobs = {
+  [`job:123:${source.liveKey}`]: { ...plan, updatedAt: 100 },
+  "job:999:other": { ...plan, source: { ...source, accountId: "999" }, options: { ...options, title: "别的账号" }, updatedAt: 200 }
+};
+assert.equal(namingHistoryFromJobs(legacyJobs, "123")[0].title, "van 游戏");
+assert.equal(namingHistoryFromJobs(legacyJobs, "123").length, 1, "历史按账号隔离");
+const data = structuredClone(legacyJobs);
+const batches = [];
+const storage = {
+  get: async (keys) => {
+    if (keys === null) return structuredClone(data);
+    const list = typeof keys === "string" ? [keys] : keys;
+    batches.push(list.length);
+    return Object.fromEntries(list.filter((key) => key in data).map((key) => [key, data[key]]));
+  },
+  getKeys: async () => Object.keys(data),
+  set: async (values) => Object.assign(data, values)
+};
+for (let index = 0; index < 110; index++) data[`job:123:${index}`] = { ...plan, options: { ...options, title: `旧队列 ${index}` }, updatedAt: 1000 + index };
+const migrated = await loadNamingHistory(storage, "123");
+assert.equal(migrated.length, 20);
+assert.equal(migrated[0].title, "旧队列 109");
+assert.equal(batches.every((size) => size <= 50), true);
+assert.ok(data[namingHistoryKey("123")]);
+const count = batches.length;
+await loadNamingHistory(storage, "123");
+assert.equal(batches.length, count + 1, "迁移仅执行一次，后续只读历史键");
+const compatible = { get: async () => legacyJobs, set: async () => {} };
+assert.equal((await loadNamingHistory(compatible, "123"))[0].title, "van 游戏", "旧 Chrome 兼容迁移");
+const nextStart = start + 86400;
+const nextSource = { ...source, liveKey: "900719925474099313", start: nextStart, end: nextStart + 25200, intervals: [{ start: nextStart, end: nextStart + 25200 }] };
+const reused = createPlan(nextSource, { ...options, ...naming[0] });
+assert.equal(reused.segments[0].start, nextStart);
+assert.equal(reused.segments[0].title, "游戏 10 第01段");
+const dated = createPlan(nextSource, { ...options, template: "{date} P{index} {title}" });
+assert.match(dated.segments[0].title, /2026-09-30 P01 van 游戏/);
+globalThis.chrome = { storage: { local: storage } };
+const savedNaming = await chromeAdapter(1).savePlan(plan);
+assert.equal(savedNaming[0].title, "van 游戏");
+assert.deepEqual(data[jobKey(source)], plan);
+assert.deepEqual(data[namingHistoryKey("123")], savedNaming);
+delete globalThis.chrome;
+console.log("自检通过：分段、暂停恢复、投稿请求、作者信息、命名去重和上限、账号隔离、旧队列迁移、当前回放命名复用。");

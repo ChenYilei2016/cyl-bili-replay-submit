@@ -1,6 +1,6 @@
 {
   "name": "cyl-bili-replay-submit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "B 站直播回放自动分段投稿工具",

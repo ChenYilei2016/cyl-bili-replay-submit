@@ -1,3 +1,5 @@
+import { loadNamingHistory, namingHistoryKey, rememberNaming } from "./naming-history.js";
+
 // 在用户点击扩展授权的 B 站页中运行。登录凭据只在该页内使用，不返回给扩展。
 export async function requestInPage(action, payload = {}) {
   const failure = (message, kind = "preflight") => ({ ok: false, error: { message, kind } });
@@ -111,6 +113,12 @@ export function chromeAdapter(tabId) {
     submit: (segment, source, options) => call("submit", { segment, source, withDanmaku: options.withDanmaku }),
     load: async (source) => (await chrome.storage.local.get(jobKey(source)))[jobKey(source)],
     save: async (job) => chrome.storage.local.set({ [jobKey(job.source)]: job }),
+    loadNamingHistory: (source) => loadNamingHistory(chrome.storage.local, source.accountId),
+    savePlan: async (job) => {
+      const history = rememberNaming(await loadNamingHistory(chrome.storage.local, job.source.accountId), job.options);
+      await chrome.storage.local.set({ [jobKey(job.source)]: job, [namingHistoryKey(job.source.accountId)]: history });
+      return history;
+    },
     lock: (callback) => navigator.locks.request("cyl-bili-replay-submit", { ifAvailable: true }, (lock) => {
       if (!lock) throw new Error("另一个工作台正在投稿，请先暂停那个队列。");
       return callback();

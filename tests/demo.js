@@ -1,4 +1,5 @@
 import { mountWorkbench } from "../extension/app.js";
+import { normalizeNamingHistory, rememberNaming } from "../extension/naming-history.js";
 
 // 独立演示适配器；不读取浏览器账号，也不调用 B 站接口。
 const start = Date.parse("2026-09-29T19:06:00+08:00") / 1000;
@@ -8,10 +9,26 @@ const source = {
   canPublishDanmaku: false, hasRestrictedContent: false, cover: "", pageUrl: ""
 };
 const storageKey = "cyl-bili-replay-demo";
+const namingKey = "cyl-bili-replay-demo-naming";
+async function loadNaming() {
+  const saved = JSON.parse(localStorage.getItem(namingKey) || "null");
+  if (saved) return normalizeNamingHistory(saved);
+  const job = JSON.parse(localStorage.getItem(storageKey) || "null");
+  const history = job ? rememberNaming([], job.options, job.updatedAt) : [];
+  localStorage.setItem(namingKey, JSON.stringify(history));
+  return history;
+}
 const workbench = mountWorkbench({
   inspect: async () => structuredClone(source),
   load: async () => JSON.parse(localStorage.getItem(storageKey) || "null"),
   save: async (job) => localStorage.setItem(storageKey, JSON.stringify(job)),
+  loadNamingHistory: loadNaming,
+  savePlan: async (job) => {
+    const history = rememberNaming(await loadNaming(), job.options);
+    localStorage.setItem(storageKey, JSON.stringify(job));
+    localStorage.setItem(namingKey, JSON.stringify(history));
+    return history;
+  },
   submit: async () => { await new Promise((resolve) => setTimeout(resolve, 900)); },
   lock: (callback) => navigator.locks.request("cyl-bili-replay-demo", { ifAvailable: true }, (lock) => {
     if (!lock) throw new Error("另一个演示页正在运行队列。");
