@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "回放接力 · B站分段投稿",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "minimum_chrome_version": "120",
-  "description": "自动分段投稿直播回放，支持回放截图封面和命名历史复用。作者：球磨川みそぎ（ChenYilei2016，B站 UID 1790439）。",
+  "description": "直播回放分段投稿，普通视频、音频和封面下载。作者：球磨川みそぎ（ChenYilei2016，B站 UID 1790439）。",
   "homepage_url": "https://github.com/ChenYilei2016/cyl-bili-replay-submit",
-  "permissions": ["activeTab", "scripting", "storage"],
-  "action": { "default_title": "打开回放接力" },
+  "permissions": ["activeTab", "scripting", "storage", "declarativeNetRequestWithHostAccess"],
+  "host_permissions": ["*://*.bilivideo.com/*", "*://*.bilivideo.cn/*", "https://*.hdslb.com/*"],
+  "action": { "default_title": "打开回放接力 · 投稿 / 下载" },
   "background": { "service_worker": "background.js", "type": "module" }
 }

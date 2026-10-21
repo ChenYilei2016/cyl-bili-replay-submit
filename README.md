@@ -2,6 +2,8 @@
 
 把自己的 B 站长直播回放，自动拆成最多两小时的独立片段，预览后依次投稿。直接使用云端回放，无需下载、转码或重新上传。
 
+也支持普通 B 站视频下载：在视频播放页点击扩展图标，保存当前分 P 的带声音视频、独立视频、音频或封面。
+
 **工具的优势：自动分段省操作，也保留推荐、搜索的分发机会。** 按 B 站当前[直播回放规则](https://www.bilibili.com/blackboard/era/q9k5jdgJKZ4oFzUW.html)，回放里的「整场投稿」不参与推荐、搜索等公域场景分发；「投片段」所有主播均可使用，会进入这些分发场景。本工具沿用「投片段」流程，让长回放有机会被新观众发现；分发机会不等于保证播放量或涨粉。
 
 ## 工具地址与作者
@@ -9,7 +11,7 @@
 | 项目 | 地址 |
 | --- | --- |
 | 工具主页 / 源码 / 安装说明 | [github.com/ChenYilei2016/cyl-bili-replay-submit](https://github.com/ChenYilei2016/cyl-bili-replay-submit) |
-| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.3.0 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.3.0.zip) |
+| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.4.1 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.4.1.zip) |
 | 源码 ZIP 下载 | [下载 main 分支](https://github.com/ChenYilei2016/cyl-bili-replay-submit/archive/refs/heads/main.zip) |
 | 作者 B 站主页 | [球磨川みそぎ · UID 1790439](https://space.bilibili.com/1790439) |
 | 本机交互演示 | [http://127.0.0.1:5817](http://127.0.0.1:5817)（本机启动 `npm run preview` 后打开） |
@@ -38,9 +40,9 @@ cd cyl-bili-replay-submit
 
 ### 快捷安装：拖入 ZIP（推荐）
 
-1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.3.0.zip)，保留 ZIP 文件，无需解压。
+1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.4.1.zip)，保留 ZIP 文件，无需解压。
 2. 使用 Chrome 120 或更高版本，在地址栏输入 `chrome://extensions`，开启右上角「开发者模式」。
-3. 将 `cyl-bili-replay-submit-extension-0.3.0.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载。
+3. 将 `cyl-bili-replay-submit-extension-0.4.1.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载。
 
 扩展安装 ZIP 的根目录直接包含 `manifest.json` 和扩展运行文件，符合[扩展 ZIP 打包要求](https://developer.chrome.com/docs/webstore/prepare)。Chrome 的扩展管理页[支持 ZIP 拖放](https://github.com/chromium/chromium/blob/main/chrome/browser/resources/extensions/drag_and_drop_handler.ts)。GitHub 的「Download ZIP」下载的是整个项目源码，按下方目录方式安装。
 
@@ -60,6 +62,17 @@ cd cyl-bili-replay-submit
 默认每段 120 分钟，请求之间至少间隔 15 秒；可调整为 1–120 分钟和 5–300 秒。每段都单独投稿，编号自动生成；取消勾选可以跳过尚未提交的段。可用标题变量是 `{title}`、`{date}`、`{index}`、`{total}`、`{start}`、`{end}`，最终标题最多 80 个字符。
 
 B 站片段投稿会在个人空间和动态展示。工具的「已提交」表示官方接口接收成功，视频生成、审核和最终发布状态请在[稿件管理](https://member.bilibili.com/platform/upload-manager/article)或直播回放的「已发布片段」中查看。
+
+## 下载普通视频
+
+1. 打开 B 站普通视频播放页（`/video/BV…` 或 `/video/av…`），多 P 视频先选中要保存的分 P。
+2. 点击「回放接力」扩展图标，会进入视频下载页；直播回放的「投片段」页仍进入分段投稿工作台。
+3. 在「视频下载」选择清晰度，保存带声音的视频；也可以分别保存「仅视频」「仅音频」或封面。下载从原 B 站页面发起，文件名包含视频标题、BV 号和分 P，保存位置遵循浏览器的下载设置。
+4. 实际进度和失败原因在 Chrome 下载列表中查看。视频地址过期时点击「重新读取」，再下载。
+
+清晰度以 B 站当前账号实际返回为准；请求较高清晰度却被降级时，会提示实际清晰度。AAC 音频按实际码率标注，只有接口返回 FLAC 轨时才标为无损。纯视频不含声音，独立音视频不会自动合并；完整视频接口返回多个文件时，会列出所有分段供逐个保存。当前支持普通视频的当前分 P，不提供整合集批量下载或番剧下载。
+
+流程来自对本机「哔哩哔哩下载助手」1.5.8 安装包的只读核对，详见[下载流程核对记录](docs/research/bilibili-download-helper.md)。本项目自行实现页面读取、格式解析和浏览器保存，不依赖该插件的服务端或外部转换工具。
 
 ## 用回放画面换封面
 
@@ -93,9 +106,9 @@ B 站片段投稿会在个人空间和动态展示。工具的「已提交」表
 
 ## 实现边界
 
-这是本地 Chrome Manifest V3 扩展，无运行依赖、服务端、账号密码输入或 Cookie 导出。仅申请 `activeTab`、`scripting`、`storage`：点击扩展时授权当前页，在原 B 站页面中执行请求。登录 Cookie 和 CSRF 只在该页面内用于请求 B 站，扩展保存账号 ID、回放参数、标题、选中的封面和队列进度。一次只运行一个工作台队列。
+这是本地 Chrome Manifest V3 扩展，无运行依赖、服务端、账号密码输入或 Cookie 导出。`activeTab`、`scripting`、`storage` 用于点击授权、页面请求和本机进度；视频保存另外使用 `declarativeNetRequestWithHostAccess` 及 `bilivideo.com`、`bilivideo.cn`、`hdslb.com` 的 CDN 访问权限。原 B 站页面使用 `strict-origin-when-cross-origin` 发起文件导航，让浏览器带上 B 站 Referer；附件规则精确匹配本次完整下载地址，只为文件导航设置保存文件名，不影响播放器媒体请求。规则机制见 [declarativeNetRequest 文档](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)。登录 Cookie 和 CSRF 只在 B 站页面内用于请求 B 站，扩展保存账号 ID、回放参数、标题、选中的封面和队列进度，不持久化普通视频的临时下载地址。一次只运行一个投稿工作台队列。
 
-当前支持自己的主播回放，可统一使用原封面或选中的回放截图，保持正常倍速，不自动添加字幕、付费观看或预约。弹幕同步选项根据官方账号权限开放。Chrome 关闭后不会继续投稿，当前版本没有后台定时任务。
+分段投稿支持自己的主播回放，可统一使用原封面或选中的回放截图，保持正常倍速，不自动添加字幕、付费观看或预约。弹幕同步选项根据官方账号权限开放。Chrome 关闭后不会继续投稿，当前版本没有后台定时任务。
 
 本工具没有解除平台限制：单段仍不超过两小时，整场投稿权限仍以 B 站为准。B 站[直播回放规则说明](https://www.bilibili.com/blackboard/era/q9k5jdgJKZ4oFzUW.html)说明回放保留 14 天，整场投稿需要开播时 500 粉丝以上，片段投稿供所有主播使用。
 
@@ -111,6 +124,8 @@ npm run preview
 打开 `http://127.0.0.1:5817` 可使用 **7 小时交互演示**。该页面由独立演示适配器提供数据，投稿按钮只运行模拟队列，不会读取 B 站账号或发送真实投稿。演示进度使用独立的 localStorage，正式扩展使用 Chrome 扩展存储，两者互不影响。
 
 核心逻辑位于 `extension/core.js`，命名历史位于 `extension/naming-history.js`，B 站页面桥接和截帧上传位于 `extension/bilibili.js`，工作台位于 `extension/app.js` 和 `extension/styles.css`。`tests/selfcheck.mjs` 是一个无框架的可运行检查，覆盖分段、暂停恢复、命名历史、账号隔离、截帧尺寸，以及封面上传和投稿参数。
+
+普通视频下载的页面桥接、地址解析和浏览器适配位于 `extension/video-download.js`，界面位于 `extension/download.html`、`extension/download-app.js` 和 `extension/download.css`，入口为 `extension/download-entry.js`。`tests/download-selfcheck.mjs` 验证当前分 P、两种播放格式、真实音轨标注、多文件视频、CDN 选择、下载请求和投稿入口分流。
 
 已通过核心自检和实际浏览器中的模拟流程：7 小时生成四段、提交第一段后暂停、刷新恢复为 1/4、继续时跳过第一段，最终完成 4/4。演示页的「重置演示」可清空独立的模拟进度，重新体验；它不会修改正式扩展的记录。
 

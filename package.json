@@ -1,9 +1,9 @@
 {
   "name": "cyl-bili-replay-submit",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "private": true,
   "type": "module",
-  "description": "B 站直播回放自动分段投稿工具",
+  "description": "B 站直播回放自动分段投稿与视频下载工具",
   "homepage": "https://github.com/ChenYilei2016/cyl-bili-replay-submit",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
     "url": "https://space.bilibili.com/1790439"
   },
   "scripts": {
-    "test": "node tests/selfcheck.mjs",
+    "test": "node tests/selfcheck.mjs && node tests/download-selfcheck.mjs",
     "preview": "node scripts/preview.mjs"
   }
 }

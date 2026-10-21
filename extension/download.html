@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>回放接力 · B站视频下载</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="download.css">
+</head>
+<body>
+  <main class="download-page">
+    <header class="page-heading">
+      <div><div class="eyebrow">回放接力 · 视频下载</div><h1>把喜欢的视频，留下来<span>。</span></h1><p>下载当前分 P 的视频、音频或封面。</p></div>
+      <button id="refreshButton" type="button" class="button secondary">重新读取</button>
+    </header>
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+    <section class="source-card" aria-label="当前视频">
+      <img id="videoCover" class="download-cover" alt="当前视频封面" referrerpolicy="no-referrer" hidden>
+      <div class="source-details"><div class="card-eyebrow">当前视频</div><h2 id="videoTitle">正在读取视频信息…</h2><p id="videoMeta">请保持原 B 站视频页打开。</p></div>
+      <a id="sourceLink" class="button secondary small" href="https://www.bilibili.com/" target="_blank" rel="noreferrer">打开视频 ↗</a>
+    </section>
+    <section class="card download-card" aria-labelledby="combinedHeading">
+      <h2 id="combinedHeading">视频下载 <span>包含声音，可直接播放</span></h2>
+      <div id="combinedOptions" class="download-options"></div>
+      <div id="combinedParts" class="download-options" hidden></div>
+      <button id="saveCover" type="button" class="text-button" hidden>下载封面 ↓</button>
+    </section>
+    <section class="card download-card" aria-labelledby="videoHeading">
+      <h2 id="videoHeading">仅视频下载 <span>不含声音</span></h2>
+      <div id="videoOptions" class="download-options"></div>
+    </section>
+    <section class="card download-card" aria-labelledby="audioHeading">
+      <h2 id="audioHeading">仅音频下载 <span>按实际编码与码率显示</span></h2>
+      <div id="audioOptions" class="download-options"></div>
+    </section>
+    <p class="page-footnote">下载进度可在 Chrome 下载列表中查看。独立视频和音频会分别保存；清晰度以 B 站当前账号实际返回为准。</p>
+  </main>
+  <script type="module" src="download-entry.js"></script>
+</body>
+</html>

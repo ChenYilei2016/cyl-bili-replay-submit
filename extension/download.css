@@ -1,0 +1,17 @@
+.download-page { max-width: 980px; margin: 0 auto; padding: 48px 28px; }
+.download-page .page-heading { align-items: flex-start; }
+.download-cover { width: 144px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 7px; }
+.download-card { padding: 24px; margin-bottom: 18px; }
+.download-card h2 { margin: 0 0 18px; font-size: 16px; }
+.download-card h2 span { display: inline-block; margin-left: 12px; color: #596f83; font-size: 12px; font-weight: 400; }
+.download-options { display: flex; flex-wrap: wrap; gap: 12px; }
+.download-options .field-help { margin: 0; }
+.download-card .text-button { margin-top: 18px; font-size: 12px; }
+#combinedParts { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 18px; }
+@media (max-width: 650px) {
+  .download-page { padding: 28px 16px; }
+  .download-page h1 { font-size: 22px; }
+  .download-cover { width: 100px; }
+  .download-card { padding: 20px; }
+  .download-card h2 span { display: block; margin: 8px 0 0; }
+}
