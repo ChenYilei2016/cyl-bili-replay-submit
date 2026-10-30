@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>回放接力 · UP 视频批量下载</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="download.css">
+</head>
+<body class="embedded">
+  <main class="download-page">
+    <p id="batchSummary" class="batch-summary" role="status">请在主页视频封面勾选要下载的视频。</p>
+    <div class="batch-actions"><label for="batchQuality">下载清晰度</label><select id="batchQuality"><option value="64">优先 720P</option><option value="80">优先 1080P</option><option value="32">优先 480P</option><option value="16">优先 360P</option></select></div>
+    <div class="batch-actions"><button id="batchStart" class="button primary" disabled>开始下载</button><button id="batchPause" class="button secondary" hidden>暂停后续</button><button id="batchRebuild" class="text-button" hidden>按当前勾选重建</button></div>
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+    <ol id="batchRows" class="batch-rows"></ol>
+    <p class="page-footnote">按顺序逐个下载带声音的视频，多 P 逐 P 保存。清晰度以账号实际返回为准；遇到失败会暂停，可重试并继续。</p>
+    <p class="page-footnote">首次批量下载如 Chrome 提示，请允许本站下载多个文件。请保持 UP 主页打开；刷新会结束本次队列，已启动的文件仍由 Chrome 继续下载。</p>
+  </main>
+  <script type="module" src="batch-download-entry.js"></script>
+</body>
+</html>

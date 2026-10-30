@@ -32,7 +32,7 @@ https://api.bilibili.com/x/player/playurl?cid=…&bvid=…&qn=…&fnver=0&fnval=
 
 ## 当前项目的实现
 
-普通视频页点击图标进入下载页；原直播回放页继续进入分段投稿。通过 `/x/web-interface/view` 定位当前分 P，再使用上面的两种 `playurl` 请求。保留接口返回的全部 `durl` 分段，按实际编码和码率显示音频，优先使用标准 HTTPS 备用 CDN，同一清晰度优先选择 AVC 视频以提高兼容性。
+普通视频页右上角直接展开下载面板，UP 主页可勾选视频批量下载；原直播回放页继续进入分段投稿。通过 `/x/web-interface/view` 定位当前分 P，再使用上面的两种 `playurl` 请求。保留接口返回的全部 `durl` 分段，按实际编码和码率显示音频，优先使用标准 HTTPS 备用 CDN，同一清晰度优先选择 AVC 视频以提高兼容性。
 
 v0.4.1 从原 B 站页面触发文件导航，并显式使用 `strict-origin-when-cross-origin`，由浏览器携带 B 站 Referer。[declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest) 会话规则只匹配本次完整下载地址的 `main_frame` 导航，通过 `Content-Disposition` 设置附件和 UTF-8 文件名，不影响播放器媒体请求。未引入外部转换工具，当前范围为普通视频的当前分 P。
 
@@ -54,3 +54,15 @@ Chrome 的实际失败记录来自本扩展，响应 MIME 为 `text/html`，文�
 回归检查先复现旧下载入口的 403 失败，再验证下载从 B 站页面发起、显式来源策略、完整地址附件规则、UTF-8 文件名和切换视频后的阻止行为。原有投稿自检与下载自检均通过。
 
 使用正确 Referer 的独立 HTTP 请求已将当前 720P 文件完整保存到项目 `artifacts/downloads/`，大小为 36,607,609 字节，与服务器长度一致；ffprobe 确认是 1280×720 H.264 视频和 AAC 音频，时长约 254.65 秒。该目录不进入 Git。此结果仍不等同于更新后的 Chrome 扩展完整下载验收；浏览器访问策略禁止自动操作 `chrome-extension://` 页面，更新和浏览器内重试需要由用户完成。
+
+## v0.5.0 页面内下载与 UP 批量选择（2026-10-30）
+
+视频页和 UP 主页使用内容脚本显示右上角入口，页面内面板复用扩展 HTML。UP 封面勾选基于当前实际页面的 `.bili-video-card`、`.bili-video-card__cover` 和 `.bili-video-card__title`，不扫描用户的其他页面、不自动加载全部投稿；最多选择 100 个视频。
+
+批量时每个视频读取一次分 P 列表，再逐 P 获取带声音的视频地址。同一时间只处理一个文件，通过 Chrome 下载事件确认当前文件完成后再继续；失败暂停，暂停后保留分 P 和文件位置。实际文件导航改为复用一个隐藏帧，继续保留 B 站来源，避免异步批量下载需要不断打开新窗口。DNR 仅匹配精确媒体 URL 的 `sub_frame` 附件响应。
+
+多个面板只在启动阶段互斥，避免相互覆盖附件规则；取得 Chrome 下载 ID 后释放规则，批量队列再跟踪这个 ID 的完成状态。已经完成的视频只保留进度计数，释放其完整分 P 元信息。
+
+验证：投稿、下载、批量自检通过；浏览器交互演示核对了原位面板、勾选、跨页、全选、暂停继续和 3 个视频共 4 个文件完成的模拟队列。真实公开视频 `BV1AinZ64E6j` 用 UP 主页 Referer 读取成功，返回 `206 video/mp4` 和 MP4 文件头；元信息和播放地址接口均允许 `Origin: https://space.bilibili.com` 及带登录凭据的跨域请求。
+
+本地隐藏帧附件探测触发了 Chrome 下载记录，但该次记录被取消（`USER_CANCELED`），未作为文件下载成功证据。模拟队列也不是 Chrome 中真实整批视频下载验收；更新扩展后的实际批量下载仍待目标浏览器验证。

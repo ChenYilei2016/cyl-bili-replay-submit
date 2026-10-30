@@ -2,7 +2,7 @@
 
 把自己的 B 站长直播回放，自动拆成最多两小时的独立片段，预览后依次投稿。直接使用云端回放，无需下载、转码或重新上传。
 
-也支持普通 B 站视频下载：在视频播放页点击扩展图标，保存当前分 P 的带声音视频、独立视频、音频或封面。
+也支持普通 B 站视频下载：视频页右上角直接展开下载面板，保存当前分 P 的视频、音频或封面；进入 UP 主页后，可以勾选视频批量下载。
 
 **工具的优势：自动分段省操作，也保留推荐、搜索的分发机会。** 按 B 站当前[直播回放规则](https://www.bilibili.com/blackboard/era/q9k5jdgJKZ4oFzUW.html)，回放里的「整场投稿」不参与推荐、搜索等公域场景分发；「投片段」所有主播均可使用，会进入这些分发场景。本工具沿用「投片段」流程，让长回放有机会被新观众发现；分发机会不等于保证播放量或涨粉。
 
@@ -11,7 +11,7 @@
 | 项目 | 地址 |
 | --- | --- |
 | 工具主页 / 源码 / 安装说明 | [github.com/ChenYilei2016/cyl-bili-replay-submit](https://github.com/ChenYilei2016/cyl-bili-replay-submit) |
-| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.4.1 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.4.1.zip) |
+| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.5.0 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.5.0.zip) |
 | 源码 ZIP 下载 | [下载 main 分支](https://github.com/ChenYilei2016/cyl-bili-replay-submit/archive/refs/heads/main.zip) |
 | 作者 B 站主页 | [球磨川みそぎ · UID 1790439](https://space.bilibili.com/1790439) |
 | 本机交互演示 | [http://127.0.0.1:5817](http://127.0.0.1:5817)（本机启动 `npm run preview` 后打开） |
@@ -40,9 +40,9 @@ cd cyl-bili-replay-submit
 
 ### 快捷安装：拖入 ZIP（推荐）
 
-1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.4.1.zip)，保留 ZIP 文件，无需解压。
+1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.5.0.zip)，保留 ZIP 文件，无需解压。
 2. 使用 Chrome 120 或更高版本，在地址栏输入 `chrome://extensions`，开启右上角「开发者模式」。
-3. 将 `cyl-bili-replay-submit-extension-0.4.1.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载。
+3. 将 `cyl-bili-replay-submit-extension-0.5.0.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载，然后刷新已经打开的 B 站页面。
 
 扩展安装 ZIP 的根目录直接包含 `manifest.json` 和扩展运行文件，符合[扩展 ZIP 打包要求](https://developer.chrome.com/docs/webstore/prepare)。Chrome 的扩展管理页[支持 ZIP 拖放](https://github.com/chromium/chromium/blob/main/chrome/browser/resources/extensions/drag_and_drop_handler.ts)。GitHub 的「Download ZIP」下载的是整个项目源码，按下方目录方式安装。
 
@@ -66,13 +66,24 @@ B 站片段投稿会在个人空间和动态展示。工具的「已提交」表
 ## 下载普通视频
 
 1. 打开 B 站普通视频播放页（`/video/BV…` 或 `/video/av…`），多 P 视频先选中要保存的分 P。
-2. 点击「回放接力」扩展图标，会进入视频下载页；直播回放的「投片段」页仍进入分段投稿工作台。
-3. 在「视频下载」选择清晰度，保存带声音的视频；也可以分别保存「仅视频」「仅音频」或封面。下载从原 B 站页面发起，文件名包含视频标题、BV 号和分 P，保存位置遵循浏览器的下载设置。
+2. 点击页面右上角「下载视频」，下载面板直接在当前页展开。工具栏扩展图标也会展开同一个面板；直播回放的「投片段」页仍进入分段投稿工作台。
+3. 在「视频下载」选择清晰度，保存带声音的视频；也可以分别保存「仅视频」「仅音频」或封面。下载从原 B 站页面的隐藏帧发起，不打开新标签页，文件名包含视频标题、BV 号和分 P，保存位置遵循浏览器的下载设置。
 4. 实际进度和失败原因在 Chrome 下载列表中查看。视频地址过期时点击「重新读取」，再下载。
 
-清晰度以 B 站当前账号实际返回为准；请求较高清晰度却被降级时，会提示实际清晰度。AAC 音频按实际码率标注，只有接口返回 FLAC 轨时才标为无损。纯视频不含声音，独立音视频不会自动合并；完整视频接口返回多个文件时，会列出所有分段供逐个保存。当前支持普通视频的当前分 P，不提供整合集批量下载或番剧下载。
+清晰度以 B 站当前账号实际返回为准；请求较高清晰度却被降级时，会提示实际清晰度。AAC 音频按实际码率标注，只有接口返回 FLAC 轨时才标为无损。纯视频不含声音，独立音视频不会自动合并；完整视频接口返回多个文件时，会列出所有分段供逐个保存。不提供番剧下载。
 
 流程来自对本机「哔哩哔哩下载助手」1.5.8 安装包的只读核对，详见[下载流程核对记录](docs/research/bilibili-download-helper.md)。本项目自行实现页面读取、格式解析和浏览器保存，不依赖该插件的服务端或外部转换工具。
+
+## 在 UP 主页勾选、批量下载
+
+1. 进入 UP 主页的「投稿 → 视频」，在视频封面勾选「选择下载」。可以只选一个，也可以点右上角「下载已选」面板中的「全选当前页」。
+2. 可以在当前主页翻页继续勾选，一次最多选择 100 个视频；「清空已选」只清除选择，不删除已保存的文件。
+3. 在面板中选择优先清晰度，点击「开始下载」。默认优先 720P，下载带声音的视频；多 P 视频逐 P 保存，一个 P 对应多个文件时保留全部文件。实际清晰度按 B 站返回结果显示。
+4. 队列等待当前文件完成后，再处理下一个文件，并保留请求间隔。点击「暂停后续」会在当前文件完成后暂停；继续时跳过已经完成的文件。失败会停止队列，处理 Chrome 或 B 站提示后可「重试并继续」。
+
+Chrome 首次提示下载多个文件时，需要允许本站下载多个文件。保持 UP 主页打开，关闭面板不会停止队列；刷新或关闭主页会结束本次选择和队列，已经启动的文件仍由 Chrome 接管。下载中改变勾选不会改写当前队列，暂停或完成后可点「按当前勾选重建」。
+
+工具读取主页已展示的视频卡片，不会为了建立列表拉取 UP 的全部投稿。每个所选视频只读取一次分 P 列表，再按需获取各 P 的下载地址；每个队列同一时间只下载一个文件。
 
 ## 用回放画面换封面
 
@@ -106,7 +117,9 @@ B 站片段投稿会在个人空间和动态展示。工具的「已提交」表
 
 ## 实现边界
 
-这是本地 Chrome Manifest V3 扩展，无运行依赖、服务端、账号密码输入或 Cookie 导出。`activeTab`、`scripting`、`storage` 用于点击授权、页面请求和本机进度；视频保存另外使用 `declarativeNetRequestWithHostAccess` 及 `bilivideo.com`、`bilivideo.cn`、`hdslb.com` 的 CDN 访问权限。原 B 站页面使用 `strict-origin-when-cross-origin` 发起文件导航，让浏览器带上 B 站 Referer；附件规则精确匹配本次完整下载地址，只为文件导航设置保存文件名，不影响播放器媒体请求。规则机制见 [declarativeNetRequest 文档](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)。登录 Cookie 和 CSRF 只在 B 站页面内用于请求 B 站，扩展保存账号 ID、回放参数、标题、选中的封面和队列进度，不持久化普通视频的临时下载地址。一次只运行一个投稿工作台队列。
+这是本地 Chrome Manifest V3 扩展，无运行依赖、服务端、账号密码输入或 Cookie 导出。`activeTab`、`scripting`、`storage` 用于页面请求和本机进度；自动显示下载入口需要 `www.bilibili.com`、`bilibili.com`、`space.bilibili.com` 的站点访问权限。内容脚本仅在视频页及 UP 空间运行；面板只在普通视频、主页和投稿视频列表中显示，展开后才加载界面，开始批量下载后才读取所选视频接口。页面内面板复用扩展自己的界面，相关机制见 [Chrome 内容脚本文档](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)和[页面资源声明](https://developer.chrome.com/docs/extensions/reference/manifest/web-accessible-resources)。
+
+`declarativeNetRequestWithHostAccess` 及 `bilivideo.com`、`bilivideo.cn`、`hdslb.com` 的 CDN 权限用于文件保存。原 B 站页面使用 `strict-origin-when-cross-origin` 发起隐藏帧导航，让浏览器带上 B 站 Referer；附件规则精确匹配本次完整下载地址的 `sub_frame` 请求，设置文件名，不影响播放器媒体请求。多个面板的启动阶段通过浏览器锁协调，文件被 Chrome 接受后释放规则，再允许下一个启动。`downloads` 权限用于确认本次文件开始，以及跟踪批量队列对应文件的完成和失败，不使用扩展页直接下载媒体，不保存其他下载记录。登录 Cookie 和 CSRF 只在 B 站页面内用于请求 B 站，扩展不持久化普通视频的临时下载地址。原有投稿进度和命名历史仍保存在本机；一次只运行一个投稿工作台队列。
 
 分段投稿支持自己的主播回放，可统一使用原封面或选中的回放截图，保持正常倍速，不自动添加字幕、付费观看或预约。弹幕同步选项根据官方账号权限开放。Chrome 关闭后不会继续投稿，当前版本没有后台定时任务。
 
@@ -125,7 +138,9 @@ npm run preview
 
 核心逻辑位于 `extension/core.js`，命名历史位于 `extension/naming-history.js`，B 站页面桥接和截帧上传位于 `extension/bilibili.js`，工作台位于 `extension/app.js` 和 `extension/styles.css`。`tests/selfcheck.mjs` 是一个无框架的可运行检查，覆盖分段、暂停恢复、命名历史、账号隔离、截帧尺寸，以及封面上传和投稿参数。
 
-普通视频下载的页面桥接、地址解析和浏览器适配位于 `extension/video-download.js`，界面位于 `extension/download.html`、`extension/download-app.js` 和 `extension/download.css`，入口为 `extension/download-entry.js`。`tests/download-selfcheck.mjs` 验证当前分 P、两种播放格式、真实音轨标注、多文件视频、CDN 选择、下载请求和投稿入口分流。
+普通视频下载的页面桥接、地址解析和浏览器适配位于 `extension/video-download.js`，页面内入口位于 `extension/download-content.js`，界面位于 `extension/download.html`、`extension/download-app.js` 和 `extension/download.css`。UP 视频勾选位于 `extension/uploader-selection.js`，批量队列位于 `extension/batch-download.js`，批量界面位于 `extension/batch-download.html` 和 `extension/batch-download-app.js`。
+
+`tests/download-selfcheck.mjs` 验证当前分 P、两种播放格式、音轨标注、隐藏帧下载和入口分流；`tests/batch-download-selfcheck.mjs` 验证多 P、多文件、串行下载、暂停继续、失败停止和监听器清理。启动 `npm run preview` 后，还可打开[视频页浮层演示](http://127.0.0.1:5817/video/BV1DEMO11111/)和[UP 勾选批量演示](http://127.0.0.1:5817/1790439/upload/video)。演示使用真实的界面与队列代码，通过独立演示适配器模拟结果，不读取账号或下载真实文件。
 
 已通过核心自检和实际浏览器中的模拟流程：7 小时生成四段、提交第一段后暂停、刷新恢复为 1/4、继续时跳过第一段，最终完成 4/4。演示页的「重置演示」可清空独立的模拟进度，重新体验；它不会修改正式扩展的记录。
 

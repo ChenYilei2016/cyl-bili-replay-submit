@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>页面下载与 UP 批量勾选 · 交互演示</title>
+  <style>
+    [hidden]{display:none!important}
+    *{box-sizing:border-box}body{margin:0;background:#f6f8fb;color:#172b3e;font:14px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}header{height:64px;background:white;border-bottom:1px solid #e8edf1;padding:0 36px;display:flex;align-items:center;gap:28px}header strong{color:#007ca8}a{color:inherit;text-decoration:none}main{max-width:1200px;margin:32px auto;padding:0 28px}.preview-note{background:#eaf8fd;border:1px dashed #b7dfef;color:#37708a;padding:13px 16px;border-radius:8px;line-height:1.8}.profile{background:white;border-radius:12px;margin:24px 0;padding:26px}h1{font-size:24px;margin:0 0 10px}.profile p{color:#617d8d;margin:0}.preview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.bili-video-card{background:white;border-radius:10px;overflow:hidden;border:1px solid #e8edf1}.bili-video-card__cover{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#193f59,#368a9d)}.bili-video-card:nth-child(2n) .bili-video-card__cover{background:linear-gradient(135deg,#51436a,#aa7c92)}.bili-video-card__cover a{height:100%;display:grid;place-items:center;color:#ffffffb3;font-size:44px;font-weight:700}.bili-video-card__title{font-size:14px;line-height:1.8;padding:15px}.preview-pagination{margin:24px 0}.preview-pagination button{border:1px solid #c8dce6;border-radius:6px;background:white;padding:9px 14px;color:#007ca8;cursor:pointer}.preview-player{margin-top:24px;height:400px;background:#153047;border-radius:12px;display:grid;place-items:center;color:#bce2ec;font-size:24px}@media(max-width:800px){.preview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+  <header><strong>回放接力 · 交互演示</strong><a href="/video/BV1DEMO11111/">视频页</a><a href="/1790439/upload/video">UP 主页</a></header>
+  <main><div class="preview-note">本地演示：不读取账号，不会实际下载文件。使用的是扩展本身的面板、勾选和队列代码，下载结果由演示适配器模拟。</div>
+    <section class="profile"><h1 id="previewTitle"></h1><p id="previewDescription"></p></section>
+    <div id="previewCards" class="preview-grid"></div>
+    <div id="previewPagination" class="preview-pagination" hidden><button id="nextPreviewPage" type="button">演示下一页</button></div>
+    <div id="previewPlayer" class="preview-player" hidden>当前视频播放区域</div>
+  </main>
+  <script src="/tests/download-demo.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "name": "cyl-bili-replay-submit",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "B 站直播回放自动分段投稿与视频下载工具",
@@ -14,7 +14,7 @@
     "url": "https://space.bilibili.com/1790439"
   },
   "scripts": {
-    "test": "node tests/selfcheck.mjs && node tests/download-selfcheck.mjs",
+    "test": "node tests/selfcheck.mjs && node tests/download-selfcheck.mjs && node tests/batch-download-selfcheck.mjs",
     "preview": "node scripts/preview.mjs"
   }
 }

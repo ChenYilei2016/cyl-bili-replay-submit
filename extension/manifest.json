@@ -1,12 +1,21 @@
 {
   "manifest_version": 3,
   "name": "回放接力 · B站分段投稿",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "minimum_chrome_version": "120",
-  "description": "直播回放分段投稿，普通视频、音频和封面下载。作者：球磨川みそぎ（ChenYilei2016，B站 UID 1790439）。",
+  "description": "直播回放分段投稿，视频页直接下载，UP 主页勾选批量下载。作者：球磨川みそぎ（ChenYilei2016，B站 UID 1790439）。",
   "homepage_url": "https://github.com/ChenYilei2016/cyl-bili-replay-submit",
-  "permissions": ["activeTab", "scripting", "storage", "declarativeNetRequestWithHostAccess"],
-  "host_permissions": ["*://*.bilivideo.com/*", "*://*.bilivideo.cn/*", "https://*.hdslb.com/*"],
+  "permissions": ["activeTab", "scripting", "storage", "declarativeNetRequestWithHostAccess", "downloads"],
+  "host_permissions": ["https://www.bilibili.com/*", "https://bilibili.com/*", "https://space.bilibili.com/*", "*://*.bilivideo.com/*", "*://*.bilivideo.cn/*", "https://*.hdslb.com/*"],
+  "content_scripts": [{
+    "matches": ["https://www.bilibili.com/video/*", "https://bilibili.com/video/*", "https://space.bilibili.com/*"],
+    "js": ["uploader-selection.js", "download-content.js"],
+    "run_at": "document_idle"
+  }],
+  "web_accessible_resources": [{
+    "resources": ["download.html", "batch-download.html"],
+    "matches": ["https://www.bilibili.com/*", "https://bilibili.com/*", "https://space.bilibili.com/*"]
+  }],
   "action": { "default_title": "打开回放接力 · 投稿 / 下载" },
   "background": { "service_worker": "background.js", "type": "module" }
 }

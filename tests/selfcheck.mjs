@@ -161,7 +161,7 @@ context.fetch = async () => ({ ok: true, json: async () => ({ code: -101, messag
 assert.equal((await bridge("submit", { source, segment: plan.segments[1] })).error.kind, "rejected");
 
 const manifest = JSON.parse(await readFile(new URL("../extension/manifest.json", import.meta.url)));
-assert.deepEqual(manifest.permissions, ["activeTab", "scripting", "storage", "declarativeNetRequestWithHostAccess"]);
+assert.deepEqual(manifest.permissions, ["activeTab", "scripting", "storage", "declarativeNetRequestWithHostAccess", "downloads"]);
 assert.match(manifest.description, /球磨川みそぎ.*ChenYilei2016.*1790439/);
 
 let naming = [];

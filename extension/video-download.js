@@ -1,12 +1,14 @@
-// 在点击图标授权的普通视频页执行，登录凭据只由 B 站网页使用。
-export async function requestVideoInPage({ quality = 64, source: expectedSource } = {}) {
+// 在当前视频页或 UP 主页执行，登录凭据只由 B 站网页使用。
+export async function requestVideoInPage({ quality = 64, source: expectedSource, bvid } = {}) {
   try {
     const pageUrl = new URL(location.href);
     const match = pageUrl.pathname.match(/^\/video\/(BV[\da-zA-Z]+|av\d+)\/?$/);
-    if (pageUrl.protocol !== "https:" || !["www.bilibili.com", "bilibili.com"].includes(pageUrl.hostname) || !match) {
-      throw new Error("请在 B 站普通视频播放页点击扩展图标。");
+    const uploader = pageUrl.origin === "https://space.bilibili.com"
+      ? pageUrl.pathname.match(/^\/(\d+)(?:\/(?:upload(?:\/video)?|video))?\/?$/) : null;
+    if (!uploader && (pageUrl.protocol !== "https:" || !["www.bilibili.com", "bilibili.com"].includes(pageUrl.hostname) || !match)) {
+      throw new Error("请从 B 站视频页或 UP 主页打开下载面板。");
     }
-    const pageNumber = Number(pageUrl.searchParams.get("p") || 1);
+    const pageNumber = uploader ? 1 : Number(pageUrl.searchParams.get("p") || 1);
     if (!Number.isSafeInteger(pageNumber) || pageNumber < 1 || !Number.isInteger(quality) || quality < 1) {
       throw new Error("视频分 P 或清晰度参数无效，请重新打开视频。");
     }
@@ -21,14 +23,30 @@ export async function requestVideoInPage({ quality = 64, source: expectedSource 
       if (!data) throw new Error("B 站未返回视频信息，请刷新后重试。");
       return data;
     };
-    const identifier = match[1].startsWith("BV") ? { bvid: match[1] } : { aid: match[1].slice(2) };
+    if (uploader && expectedSource) {
+      if (expectedSource.uploaderId !== uploader[1] || !/^BV[\da-zA-Z]+$/.test(expectedSource.bvid)
+          || !/^\d+$/.test(expectedSource.cid) || !Number.isSafeInteger(expectedSource.pageNumber) || expectedSource.pageNumber < 1) {
+        throw new Error("UP 主页已切换或视频分 P 无效，请重新建立下载队列。");
+      }
+      const combined = await get("/x/player/playurl", {
+        bvid: expectedSource.bvid, cid: expectedSource.cid, qn: String(quality), fourk: "1", otype: "json"
+      });
+      return { ok: true, data: { source: expectedSource, combined } };
+    }
+    if (uploader && !/^BV[\da-zA-Z]+$/.test(bvid || "")) throw new Error("请先在 UP 主页勾选要下载的视频。");
+    const identifier = uploader ? { bvid } : match[1].startsWith("BV") ? { bvid: match[1] } : { aid: match[1].slice(2) };
     const video = await get("/x/web-interface/view", identifier);
     const part = video.pages?.[pageNumber - 1];
     if (!part?.cid || !video.bvid) throw new Error("当前分 P 不存在，请重新选择视频分 P。");
     const source = {
       bvid: video.bvid, cid: String(part.cid), pageNumber, title: video.title, part: part.part,
-      cover: String(video.pic || "").replace(/^http:/, "https:"), pageUrl: `${pageUrl.origin}${pageUrl.pathname}?p=${pageNumber}`
+      cover: String(video.pic || "").replace(/^http:/, "https:"),
+      pageUrl: uploader ? `https://www.bilibili.com/video/${video.bvid}/?p=1` : `${pageUrl.origin}${pageUrl.pathname}?p=${pageNumber}`,
+      ...(uploader ? { uploaderId: uploader[1] } : {})
     };
+    if (uploader) return { ok: true, data: { source, parts: video.pages.map((item, index) => ({
+      cid: String(item.cid), pageNumber: index + 1, part: item.part
+    })) } };
     if (expectedSource && (expectedSource.bvid !== source.bvid || expectedSource.cid !== source.cid)) {
       throw new Error("原视频页已切换视频或分 P，请先点击「重新读取」。");
     }
@@ -119,21 +137,27 @@ export function downloadFilename(source, file) {
 function startDownloadInPage(source, mediaUrl) {
   const current = new URL(location.href);
   const expected = new URL(source.pageUrl);
-  if (!["https://www.bilibili.com", "https://bilibili.com"].includes(current.origin)
-      || current.origin !== expected.origin
-      || current.pathname.replace(/\/$/, "") !== expected.pathname.replace(/\/$/, "")
-      || Number(current.searchParams.get("p") || 1) !== source.pageNumber) {
-    return { ok: false, error: "原视频页已切换视频或分 P，请先点击「重新读取」。" };
+  const uploader = current.origin === "https://space.bilibili.com"
+    ? current.pathname.match(/^\/(\d+)(?:\/(?:upload(?:\/video)?|video))?\/?$/) : null;
+  const samePage = source.uploaderId ? uploader?.[1] === source.uploaderId
+    : ["https://www.bilibili.com", "https://bilibili.com"].includes(current.origin)
+      && current.origin === expected.origin
+      && current.pathname.replace(/\/$/, "") === expected.pathname.replace(/\/$/, "")
+      && Number(current.searchParams.get("p") || 1) === source.pageNumber;
+  if (!samePage) {
+    return { ok: false, error: "原页面已切换，请重新读取视频或重建下载队列。" };
   }
-  // 从 B 站页面导航到 CDN，浏览器自然携带其来源，避免扩展下载请求丢失 Referer。
-  const link = document.createElement("a");
-  link.href = mediaUrl;
-  link.target = "_blank";
-  link.rel = "noopener";
-  link.referrerPolicy = "strict-origin-when-cross-origin";
-  document.body.append(link);
-  link.click();
-  link.remove();
+  // 复用一个隐藏下载帧：保留 B 站来源，批量下载也不打开弹出窗口或替换主页。
+  let transfer = document.getElementById("cyl-bili-download-transfer");
+  if (!transfer) {
+    transfer = document.createElement("iframe");
+    transfer.id = "cyl-bili-download-transfer";
+    transfer.hidden = true;
+    transfer.title = "文件下载";
+    transfer.referrerPolicy = "strict-origin-when-cross-origin";
+    document.body.append(transfer);
+  }
+  transfer.src = mediaUrl;
   return { ok: true };
 }
 
@@ -155,27 +179,45 @@ export function chromeVideoDownloadAdapter(tabId) {
     download: async (source, file) => {
       const url = selectMediaUrl({ url: file.url });
       if (!url) throw new Error("下载地址无效，请重新读取视频信息。");
-      await chrome.declarativeNetRequest.updateSessionRules({
-        removeRuleIds: [1],
-        addRules: [{
-          id: 1, priority: 1,
-          action: { type: "modifyHeaders", responseHeaders: [{
-            header: "Content-Disposition", operation: "set",
-            value: `attachment; filename*=UTF-8''${encodeURIComponent(downloadFilename(source, file))}`
-          }] },
-          condition: { urlFilter: `|${url}|`, resourceTypes: ["main_frame"] }
-        }]
-      });
-      let results;
-      try {
-        results = await chrome.scripting.executeScript({
-          target: { tabId }, world: "MAIN", func: startDownloadInPage, args: [source, url]
+      // 只锁定浏览器接受文件之前的启动阶段，避免多个面板相互替换附件规则。
+      return navigator.locks.request("cyl-bili-download-start", async () => {
+        await chrome.declarativeNetRequest.updateSessionRules({
+          removeRuleIds: [1],
+          addRules: [{
+            id: 1, priority: 1,
+            action: { type: "modifyHeaders", responseHeaders: [{
+              header: "Content-Disposition", operation: "set",
+              value: `attachment; filename*=UTF-8''${encodeURIComponent(downloadFilename(source, file))}`
+            }] },
+            condition: { urlFilter: `|${url}|`, resourceTypes: ["sub_frame"] }
+          }]
         });
-      } catch {
-        throw new Error("无法在原视频页启动下载，请在 B 站视频页再次点击扩展图标。");
-      }
-      const result = results[0]?.result;
-      if (!result?.ok) throw new Error(result?.error || "未能启动下载，请重新读取视频。");
+        let onCreated;
+        let timeout;
+        const started = new Promise((resolve, reject) => {
+          onCreated = (item) => {
+            if (item.url !== url && item.finalUrl !== url) return;
+            if (item.state === "interrupted") reject(new Error(`浏览器下载中断：${item.error || "请查看下载列表"}`));
+            else resolve(item.id);
+          };
+          chrome.downloads.onCreated.addListener(onCreated);
+          timeout = setTimeout(() => reject(new Error("浏览器尚未启动下载，请检查是否需要允许本站下载多个文件。")), 120000);
+        });
+        try {
+          const request = chrome.scripting.executeScript({
+            target: { tabId }, world: "MAIN", func: startDownloadInPage, args: [source, url]
+          }).then((results) => {
+            const result = results[0]?.result;
+            if (!result?.ok) throw new Error(result?.error || "未能启动下载，请重新读取视频。");
+          });
+          const [, downloadId] = await Promise.all([request, started]);
+          return downloadId;
+        } finally {
+          clearTimeout(timeout);
+          chrome.downloads.onCreated.removeListener(onCreated);
+          await chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1] });
+        }
+      });
     }
   };
 }

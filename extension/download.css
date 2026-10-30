@@ -8,6 +8,34 @@
 .download-options .field-help { margin: 0; }
 .download-card .text-button { margin-top: 18px; font-size: 12px; }
 #combinedParts { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 18px; }
+body.embedded { background: #fff; }
+.embedded .download-page { margin: 0; padding: 14px; }
+.embedded .page-heading { justify-content: flex-end; margin-bottom: 12px; }
+.embedded .page-heading > div, .embedded #sourceLink { display: none; }
+.embedded .page-heading .button { height: 30px; font-size: 11px; }
+.embedded .source-card { padding: 12px; margin-bottom: 12px; gap: 12px; flex-wrap: nowrap; }
+.embedded .download-cover { width: 84px; }
+.embedded .source-details h2 { font-size: 13px; margin: 6px 0; line-height: 1.5; }
+.embedded .source-details p { font-size: 10px; line-height: 1.6; }
+.embedded .download-card { padding: 14px; margin-bottom: 12px; }
+.embedded .download-card h2 { font-size: 14px; margin-bottom: 12px; }
+.embedded .download-card h2 span { display: block; margin: 6px 0 0; font-size: 11px; }
+.embedded .download-options { gap: 8px; }
+.embedded .download-options .button { height: 34px; padding-inline: 11px; font-size: 12px; }
+.embedded .page-footnote { font-size: 11px; line-height: 1.8; }
+.batch-summary { margin: 0 0 14px; font-size: 13px; line-height: 1.7; }
+.batch-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.batch-actions label { margin: 0; }
+.batch-actions select { padding: 7px 10px; border: 1px solid #dfe8ee; border-radius: 5px; background: #fff; color: #172b3e; font: inherit; }
+.batch-rows { padding: 0; list-style: none; counter-reset: batch; }
+.batch-rows li { counter-increment: batch; position: relative; padding: 12px 12px 12px 36px; border: 1px solid #e8edf1; border-radius: 7px; margin-bottom: 9px; }
+.batch-rows li::before { content: counter(batch); position: absolute; top: 13px; left: 12px; color: #81909e; font-size: 12px; }
+.batch-rows strong, .batch-rows small, .batch-rows span { display: block; line-height: 1.6; }
+.batch-rows strong { font-size: 12px; font-weight: 550; overflow-wrap: anywhere; }
+.batch-rows small { margin-top: 4px; color: #617d8d; font-size: 10px; }
+.batch-rows span { margin-top: 5px; color: #617d8d; font-size: 11px; }
+.batch-rows .completed span { color: #32765e; }
+.batch-rows .failed span { color: #a2533b; }
 @media (max-width: 650px) {
   .download-page { padding: 28px 16px; }
   .download-page h1 { font-size: 22px; }
