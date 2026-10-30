@@ -1,5 +1,7 @@
 # 回放接力
 
+<img src="extension/icons/logo.svg" alt="回放接力 Logo" width="80" height="80">
+
 把自己的 B 站长直播回放，自动拆成最多两小时的独立片段，预览后依次投稿。直接使用云端回放，无需下载、转码或重新上传。
 
 也支持普通 B 站视频下载：视频页右上角直接展开下载面板，保存当前分 P 的视频、音频或封面；进入 UP 主页后，可以勾选视频批量下载。
@@ -11,7 +13,7 @@
 | 项目 | 地址 |
 | --- | --- |
 | 工具主页 / 源码 / 安装说明 | [github.com/ChenYilei2016/cyl-bili-replay-submit](https://github.com/ChenYilei2016/cyl-bili-replay-submit) |
-| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.5.0 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.5.0.zip) |
+| 扩展安装 ZIP（直接拖入 Chrome） | [下载 v0.5.1 安装包](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.5.1.zip) |
 | 源码 ZIP 下载 | [下载 main 分支](https://github.com/ChenYilei2016/cyl-bili-replay-submit/archive/refs/heads/main.zip) |
 | 作者 B 站主页 | [球磨川みそぎ · UID 1790439](https://space.bilibili.com/1790439) |
 | 本机交互演示 | [http://127.0.0.1:5817](http://127.0.0.1:5817)（本机启动 `npm run preview` 后打开） |
@@ -40,9 +42,9 @@ cd cyl-bili-replay-submit
 
 ### 快捷安装：拖入 ZIP（推荐）
 
-1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.5.0.zip)，保留 ZIP 文件，无需解压。
+1. [下载扩展安装 ZIP](https://github.com/ChenYilei2016/cyl-bili-replay-submit/raw/refs/heads/main/dist/cyl-bili-replay-submit-extension-0.5.1.zip)，保留 ZIP 文件，无需解压。
 2. 使用 Chrome 120 或更高版本，在地址栏输入 `chrome://extensions`，开启右上角「开发者模式」。
-3. 将 `cyl-bili-replay-submit-extension-0.5.0.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载，然后刷新已经打开的 B 站页面。
+3. 将 `cyl-bili-replay-submit-extension-0.5.1.zip` 拖进这个扩展管理页面，按 Chrome 提示完成加载，然后刷新已经打开的 B 站页面。
 
 扩展安装 ZIP 的根目录直接包含 `manifest.json` 和扩展运行文件，符合[扩展 ZIP 打包要求](https://developer.chrome.com/docs/webstore/prepare)。Chrome 的扩展管理页[支持 ZIP 拖放](https://github.com/chromium/chromium/blob/main/chrome/browser/resources/extensions/drag_and_drop_handler.ts)。GitHub 的「Download ZIP」下载的是整个项目源码，按下方目录方式安装。
 
@@ -99,6 +101,8 @@ Chrome 首次提示下载多个文件时，需要允许本站下载多个文件�
 ## 作者信息与命名历史
 
 安装包自带作者 **球磨川みそぎ / ChenYilei2016**、B 站 UID **1790439** 和主页链接。Chrome 扩展详情的描述中可查看作者，工作台侧栏会显示作者署名；点击页脚「关于作者」可查看版本、B 站主页、GitHub 主页及项目地址。
+
+工具栏、工作台与下载面板使用统一的「播放＋循环接力」蓝绿图标。矢量源文件位于 `extension/icons/logo.svg`，同时提供 16、32、48、128 像素 PNG，供 Chrome 工具栏、扩展管理和页面图标使用。
 
 - 点击「更新分段计划」或确认开始投稿后，记录本次回放标题和标题格式。按 B 站登录账号分别保存，最多保留最近 20 组；相同名字和格式会去重并排到最近，同名但不同格式分别保留。
 - 新回放默认带入该账号最近一次使用的名字和格式，也可以在「历史命名」中一键选择，立即生成当前回放的分段预览。`{date}`、`{index}`、`{total}`、`{start}`、`{end}` 都按当前回放计算，字面文本原样保留；建议用 `{date}` 表达日期。

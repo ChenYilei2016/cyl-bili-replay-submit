@@ -4,6 +4,7 @@ const LIVE_CENTER = "https://link.bilibili.com/p/center/index#/my-room/live-reco
 const ARCHIVES = "https://member.bilibili.com/platform/upload-manager/article";
 const TOOL_HOME = "https://github.com/ChenYilei2016/cyl-bili-replay-submit";
 const AUTHOR_HOME = "https://space.bilibili.com/1790439";
+const BRAND_ICON = new URL("./icons/logo.svg", import.meta.url).href;
 const STATUS = {
   pending: "等待投稿", submitting: "正在提交", submitted: "已提交",
   failed: "提交失败", uncertain: "待核对"
@@ -16,7 +17,7 @@ const playIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7
 export function mountWorkbench(adapter) {
   document.querySelector("#app").innerHTML = `
     <aside class="sidebar">
-      <a class="brand" href="#"><span class="brand-icon">${playIcon}<i></i></span><span>回放接力<small>REPLAY RELAY</small></span></a>
+      <a class="brand" href="#"><img class="brand-icon" src="${BRAND_ICON}" alt=""><span>回放接力<small>REPLAY RELAY</small></span></a>
       <a class="brand-author" href="${AUTHOR_HOME}" target="_blank" rel="noreferrer">作者：球磨川みそぎ · ChenYilei2016</a>
       <div class="workspace-label">我的工作台</div>
       <a class="nav-item active" href="#workspace" aria-current="page"><span>▤</span>分段投稿<span class="nav-dot"></span></a>

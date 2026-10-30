@@ -229,5 +229,5 @@ assert.equal(panelContext.ok, false);
 const manifest = JSON.parse(await readFile(new URL("../extension/manifest.json", import.meta.url)));
 assert.deepEqual(manifest.content_scripts[0].js, ["uploader-selection.js", "download-content.js"]);
 assert.ok(manifest.content_scripts[0].matches.includes("https://space.bilibili.com/*"));
-assert.deepEqual(manifest.web_accessible_resources[0].resources, ["download.html", "batch-download.html"]);
+assert.deepEqual(manifest.web_accessible_resources[0].resources, ["download.html", "batch-download.html", "icons/logo.svg"]);
 console.log("下载自检通过：当前分 P、清晰度、音轨标签、完整分段、CDN 地址、下载请求和投稿入口分流。");

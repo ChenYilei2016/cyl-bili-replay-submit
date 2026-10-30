@@ -1,5 +1,6 @@
 (() => {
   const hostId = "cyl-bili-video-download";
+  const logoUrl = chrome.runtime.getURL("icons/logo.svg");
   document.getElementById(hostId)?.remove();
   const host = document.createElement("div");
   host.id = hostId;
@@ -13,10 +14,11 @@
       button:focus-visible { outline: 3px solid #79d9f7; outline-offset: 3px; }
       .trigger { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 15px; border: 1px solid #cce9f4; border-radius: 20px; background: #fff; color: #007ca8; font-weight: 600; box-shadow: 0 3px 14px #172b3e16; }
       .trigger:hover, .trigger[aria-expanded="true"] { background: #eaf8fd; }
-      .trigger svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .brand-logo { display: block; width: 22px; height: 22px; flex-shrink: 0; border-radius: 6px; }
       .panel { position: absolute; top: 48px; right: 0; display: flex; flex-direction: column; width: min(440px, calc(100vw - 32px)); height: min(650px, calc(100dvh - 156px)); border: 1px solid #dfe8ee; border-radius: 12px; background: #fff; box-shadow: 0 12px 40px #172b3e29; overflow: hidden; }
       .heading { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; padding: 13px 16px; border-bottom: 1px solid #e8edf1; }
       .heading strong { font-size: 14px; font-weight: 650; }
+      .heading-brand { display: flex; align-items: center; gap: 9px; }
       .selection-tools { padding: 10px 14px; border-bottom: 1px solid #e8edf1; }
       .selection-tools button { padding: 5px 9px; margin-right: 8px; border: 1px solid #d9e7ed; border-radius: 5px; background: #fff; color: #007ca8; font-size: 12px; }
       .selection-tools p { margin: 8px 0 0; color: #617d8d; font-size: 11px; line-height: 1.5; }
@@ -26,10 +28,10 @@
       @media (max-width: 600px) { :host { top: 76px; right: 12px; } .panel { width: calc(100vw - 24px); height: calc(100dvh - 144px); } }
     </style>
     <button class="trigger" type="button" aria-expanded="false" aria-controls="downloadPanel">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v5h14v-5"/></svg><span id="triggerLabel">下载视频</span>
+      <img class="brand-logo" src="${logoUrl}" alt=""><span id="triggerLabel">下载视频</span>
     </button>
     <section id="downloadPanel" class="panel" role="dialog" aria-label="视频下载" hidden>
-      <div class="heading"><strong>回放接力 · 视频下载</strong><button class="close" type="button" aria-label="关闭下载面板">×</button></div>
+      <div class="heading"><div class="heading-brand"><img class="brand-logo" src="${logoUrl}" alt=""><strong>回放接力 · 视频下载</strong></div><button class="close" type="button" aria-label="关闭下载面板">×</button></div>
       <div id="selectionTools" class="selection-tools" hidden><button id="selectPage" type="button">全选当前页</button><button id="clearSelection" type="button">清空已选</button><p id="selectionHint">在视频封面勾选，支持跨页选择，最多 100 个。</p></div>
     </section>`;
   const trigger = root.querySelector(".trigger");

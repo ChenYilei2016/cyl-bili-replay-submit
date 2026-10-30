@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>回放接力</title>
+  <defs>
+    <linearGradient id="tile" x1="12" y1="8" x2="120" y2="124" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#346CF5"/>
+      <stop offset="0.52" stop-color="#119FD6"/>
+      <stop offset="1" stop-color="#08C6A8"/>
+    </linearGradient>
+    <radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(23 8) rotate(55) scale(103)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="url(#tile)"/>
+  <rect width="128" height="128" rx="30" fill="url(#light)"/>
+  <rect x="0.75" y="0.75" width="126.5" height="126.5" rx="29.25" stroke="white" stroke-opacity="0.18" stroke-width="1.5"/>
+  <path d="M98 78A37 37 0 1 1 95 44" stroke="white" stroke-opacity="0.94" stroke-width="9" stroke-linecap="round"/>
+  <path d="M81 51H100V32" stroke="white" stroke-opacity="0.94" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M53 47.5C53 45.5 55.2 44.3 56.9 45.4L80 60.2C82 61.5 82 64.5 80 65.8L56.9 80.6C55.2 81.7 53 80.5 53 78.5V47.5Z" fill="white"/>
+</svg>

@@ -13,9 +13,7 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 .brand { display: flex; align-items: center; gap: 12px; font-weight: 750; font-size: 21px; letter-spacing: .5px; padding-left: 7px; }
 .brand small { display: block; margin-top: 5px; font-size: 9px; font-weight: 550; letter-spacing: 2.1px; color: #91a4b4; }
 .brand-author { font-size: 10px; color: #526f85; margin: 16px 7px 0; line-height: 1.7; }
-.brand-icon { width: 40px; height: 40px; position: relative; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--blue); box-shadow: 0 5px 14px #00a7df20; }
-.brand-icon svg { width: 25px; height: 25px; fill: currentColor; }
-.brand-icon i { position: absolute; width: 3px; height: 12px; background: white; border-radius: 2px; right: 8px; }
+.brand-icon { width: 40px; height: 40px; flex-shrink: 0; display: block; border-radius: 11px; box-shadow: 0 5px 14px #007ca820; }
 .workspace-label { margin: 52px 16px 14px; color: #9ca9b4; font-size: 11px; letter-spacing: 1px; }
 .nav-item { height: 46px; border-radius: 9px; display: flex; align-items: center; gap: 12px; color: #728292; font-size: 13px; margin-bottom: 8px; padding: 0 15px; }
 .nav-item > span:first-child { width: 18px; font-size: 20px; }
